@@ -58,11 +58,23 @@
   <tr><td>國家／地區</td><td>排行榜與統計分區</td><td>選填</td></tr>
   <tr><td>裝置識別碼</td><td>區分裝置、關聯訪客資料</td><td>自動產生</td></tr>
   <tr><td>遊戲紀錄（分數、關卡進度、練習紀錄）</td><td>儲存進度、計算與顯示排行榜</td><td>使用中自動產生</td></tr>
-  <tr><td>購買／會員狀態</td><td>提供已購買的功能</td><td>視購買情況</td></tr>
+  <tr><td>帳號權益狀態</td><td>提供對應的帳號功能</td><td>自動</td></tr>
 </table>
 
 <p><strong>我們不會蒐集：</strong>你的生日或年齡、精確地理位置、通訊錄、簡訊或通話紀錄。</p>
 <p>若你以「訪客」身分遊玩而未登入，遊戲紀錄會儲存在你的裝置本機，我們不會將其與任何個人身分連結。</p>
+
+<h3>自動蒐集的資料（僅限 Google Play 發布版本）</h3>
+<p>
+  在 Google Play 發布的版本中，本應用程式整合了 <strong>Google Firebase Analytics 與 Crashlytics</strong>，
+  用於了解整體使用情況與診斷當機問題。這些服務可能自動蒐集：
+</p>
+<ul>
+  <li>app 使用與互動事件（例如開啟的畫面、遊玩次數）</li>
+  <li>裝置型號、作業系統版本、語言、約略地區（由 IP 位址推估，<strong>非</strong>精確定位）</li>
+  <li>app 執行個體識別碼，以及當機發生時的診斷紀錄</li>
+</ul>
+<p>這些資料用於改善 app 的品質與穩定性，<strong>不會</strong>用於販售。測試／開發版本不含這些分析功能。</p>
 
 <h2>2. 我們如何使用這些資料</h2>
 <ul>
@@ -71,13 +83,14 @@
   <li>儲存你的遊戲進度與成就。</li>
   <li>寄送帳號相關的必要信件（例如密碼重設）。</li>
 </ul>
-<p>我們<strong>不會</strong>將你的個人資料販售或出租給第三方，也不會用於廣告追蹤。</p>
+<p>我們<strong>不會</strong>將你的個人資料販售或出租給第三方，也不會在本應用程式內投放第三方廣告。我們僅透過 Google Firebase 進行使用分析與當機診斷，用以改善 app（見第 3 節）。</p>
 
 <h2>3. 第三方服務</h2>
 <p>本應用程式使用下列第三方服務協助運作，這些服務會在其各自的隱私權政策下處理上述部分資料：</p>
 <table>
   <tr><th>服務</th><th>用途</th><th>隱私權政策</th></tr>
   <tr><td>Supabase</td><td>帳號驗證、資料庫與檔案儲存（保存上述帳號與遊戲資料）</td><td><a href="https://supabase.com/privacy" target="_blank" rel="noopener">supabase.com/privacy</a></td></tr>
+  <tr><td>Google Firebase（Analytics、Crashlytics）</td><td>使用分析與當機診斷，用以改善 app（僅發布版本）</td><td><a href="https://firebase.google.com/support/privacy" target="_blank" rel="noopener">firebase.google.com/support/privacy</a></td></tr>
   <tr><td>Google 登入</td><td>若你選擇用 Google 帳號登入</td><td><a href="https://policies.google.com/privacy" target="_blank" rel="noopener">policies.google.com/privacy</a></td></tr>
   <tr><td>Apple 登入</td><td>若你選擇用 Apple 帳號登入</td><td><a href="https://www.apple.com/legal/privacy/" target="_blank" rel="noopener">apple.com/legal/privacy</a></td></tr>
   <tr><td>Resend</td><td>寄送帳號相關電子郵件</td><td><a href="https://resend.com/legal/privacy-policy" target="_blank" rel="noopener">resend.com/legal/privacy-policy</a></td></tr>
@@ -136,11 +149,23 @@
   <tr><td>Country / region</td><td>Leaderboard and statistics grouping</td><td>Optional</td></tr>
   <tr><td>Device identifier</td><td>Distinguish devices, associate guest data</td><td>Auto-generated</td></tr>
   <tr><td>Game data (scores, level progress, practice history)</td><td>Save progress, compute and show leaderboards</td><td>Generated during use</td></tr>
-  <tr><td>Purchase / membership status</td><td>Provide purchased features</td><td>If applicable</td></tr>
+  <tr><td>Account entitlement status</td><td>Provide corresponding account features</td><td>Automatic</td></tr>
 </table>
 
 <p><strong>We do NOT collect:</strong> your birthday or age, precise location, contacts, SMS, or call logs.</p>
 <p>If you play as a "guest" without signing in, game data is stored locally on your device and is not linked to any personal identity.</p>
+
+<h3>Automatically Collected Data (Google Play release builds only)</h3>
+<p>
+  In the version published on Google Play, the App integrates <strong>Google Firebase Analytics and Crashlytics</strong>
+  to understand overall usage and to diagnose crashes. These services may automatically collect:
+</p>
+<ul>
+  <li>App usage and interaction events (e.g. screens opened, number of plays)</li>
+  <li>Device model, OS version, language, approximate region (estimated from IP address, <strong>not</strong> precise location)</li>
+  <li>App instance identifier, and crash diagnostics when a crash occurs</li>
+</ul>
+<p>This data is used to improve the App's quality and stability and is <strong>not</strong> sold. Test/development builds do not include these analytics features.</p>
 
 <h2>2. How We Use Your Information</h2>
 <ul>
@@ -149,13 +174,14 @@
   <li>Save your game progress and achievements.</li>
   <li>Send essential account emails (e.g. password reset).</li>
 </ul>
-<p>We do <strong>not</strong> sell or rent your personal data to third parties, and we do not use it for advertising tracking.</p>
+<p>We do <strong>not</strong> sell or rent your personal data to third parties, and we do not show third-party ads in the App. We use Google Firebase only for usage analytics and crash diagnostics to improve the App (see Section 3).</p>
 
 <h2>3. Third-Party Services</h2>
 <p>The App relies on the following third-party services, which process some of the above data under their own privacy policies:</p>
 <table>
   <tr><th>Service</th><th>Purpose</th><th>Privacy Policy</th></tr>
   <tr><td>Supabase</td><td>Authentication, database, and file storage (stores the account and game data above)</td><td><a href="https://supabase.com/privacy" target="_blank" rel="noopener">supabase.com/privacy</a></td></tr>
+  <tr><td>Google Firebase (Analytics, Crashlytics)</td><td>Usage analytics and crash diagnostics to improve the App (release builds only)</td><td><a href="https://firebase.google.com/support/privacy" target="_blank" rel="noopener">firebase.google.com/support/privacy</a></td></tr>
   <tr><td>Google Sign-In</td><td>If you choose to sign in with Google</td><td><a href="https://policies.google.com/privacy" target="_blank" rel="noopener">policies.google.com/privacy</a></td></tr>
   <tr><td>Apple Sign-In</td><td>If you choose to sign in with Apple</td><td><a href="https://www.apple.com/legal/privacy/" target="_blank" rel="noopener">apple.com/legal/privacy</a></td></tr>
   <tr><td>Resend</td><td>Sending account-related emails</td><td><a href="https://resend.com/legal/privacy-policy" target="_blank" rel="noopener">resend.com/legal/privacy-policy</a></td></tr>
