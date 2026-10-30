@@ -33,7 +33,7 @@
   button.primary { background: var(--brand); color: var(--brand-ink); border-color: var(--brand); font-weight: 700; }
   button.link { border: none; background: none; color: var(--brand); padding: 4px 0; }
   button:disabled { opacity: .5; cursor: default; }
-  input[type=number], input[type=email], input[type=password] { font: inherit; width: 100%; padding: 10px 12px; border-radius: 10px; border: 1px solid var(--line); background: var(--bg); color: var(--ink); }
+  input[type=number], input[type=text], input[type=password] { font: inherit; width: 100%; padding: 10px 12px; border-radius: 10px; border: 1px solid var(--line); background: var(--bg); color: var(--ink); }
   #login { max-width: 420px; margin: 40px auto; display: grid; gap: 12px; }
   #login h2 { margin: 0 0 4px; font-size: 20px; }
   #login .row { display: grid; gap: 8px; }
@@ -91,17 +91,11 @@
 
   <section id="login" class="card hidden">
     <h2>登入</h2>
-    <p class="muted small" style="margin:0">用遊戲裡的帳號登入。只有管理員帳號能存檔。</p>
-    <button class="primary" data-oauth="apple">用 Apple 登入</button>
-    <button data-oauth="google">用 Google 登入</button>
-    <details>
-      <summary class="small">用 Email 登入</summary>
-      <form id="emailForm" class="row" style="margin-top:10px">
-        <input type="email" id="email" placeholder="Email" autocomplete="username" required>
-        <input type="password" id="password" placeholder="密碼" autocomplete="current-password" required>
-        <button class="primary" type="submit">登入</button>
-      </form>
-    </details>
+    <form id="loginForm" class="row">
+      <input type="text" id="account" placeholder="帳號" autocomplete="username" autocapitalize="none" spellcheck="false" required>
+      <input type="password" id="password" placeholder="密碼" autocomplete="current-password" required>
+      <button class="primary" type="submit">登入</button>
+    </form>
     <div id="loginMsg" class="status err"></div>
   </section>
 
@@ -194,6 +188,7 @@
   // anon key：和 App 裡同一把（公開的前端金鑰）。能改什麼由資料庫規則決定（supabase/app_update_gate.sql）。
   const ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhjcWlrYWhiZHl6eWp4cWxzdHhjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIyMDIwNjQsImV4cCI6MjA4Nzc3ODA2NH0.5Vmr4omcqnEsjDrlaCjGFTYzd4QJNPpeDMsyN87WkYI';
   const BUCKET = 'update';
+  const ADMIN_DOMAIN = '@admin.mathgameapp.app';
   const MAX_BYTES = 1024 * 1024;
   const sb = supabase.createClient(URL_, ANON, { auth: { persistSession: true, detectSessionInUrl: true, flowType: 'pkce' } });
 
@@ -329,21 +324,21 @@
     const signout = $('#signout');
     if (!session) { $('#who').textContent = ''; signout.classList.add('hidden'); show('login'); return; }
     const u = session.user;
-    $('#who').textContent = u.email || (u.app_metadata && u.app_metadata.provider) || '';
+    $('#who').textContent = (u.email || '').replace(ADMIN_DOMAIN, '');
     signout.classList.remove('hidden');
     const { data: isAdmin, error } = await sb.rpc('is_app_admin');
     if (error || !isAdmin) { $('#myUid').textContent = u.id; show('noadmin'); return; }
     show('admin'); await loadAdmin();
   }
 
-  document.querySelectorAll('[data-oauth]').forEach(b => b.onclick = async () => {
-    const { error } = await sb.auth.signInWithOAuth({ provider: b.dataset.oauth, options: { redirectTo: location.origin + location.pathname } });
-    if (error) $('#loginMsg').textContent = '登入失敗：' + error.message;
-  });
-  $('#emailForm').onsubmit = async (e) => {
+  // 帳號（老闆 10/30：一組帳號密碼就好）：沒有 @ 的帳號對到後台專用信箱（不收信，只拿來登入）；打完整 Email 的照用
+  $('#loginForm').onsubmit = async (e) => {
     e.preventDefault();
-    const { error } = await sb.auth.signInWithPassword({ email: $('#email').value.trim(), password: $('#password').value });
-    if (error) $('#loginMsg').textContent = '登入失敗：' + error.message;
+    const id = $('#account').value.trim().toLowerCase();
+    const email = id.includes('@') ? id : id + ADMIN_DOMAIN;
+    $('#loginMsg').textContent = '';
+    const { error } = await sb.auth.signInWithPassword({ email, password: $('#password').value });
+    if (error) $('#loginMsg').textContent = /invalid/i.test(error.message) ? '帳號或密碼不對' : '登入失敗：' + error.message;
   };
   $('#signout').onclick = async () => { await sb.auth.signOut(); };
 
