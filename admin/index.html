@@ -327,7 +327,16 @@
     $('#who').textContent = (u.email || '').replace(ADMIN_DOMAIN, '');
     signout.classList.remove('hidden');
     const { data: isAdmin, error } = await sb.rpc('is_app_admin');
-    if (error || !isAdmin) { $('#myUid').textContent = u.id; show('noadmin'); return; }
+    if (error || !isAdmin) {
+      // 不是管理員（例如之前用別的方式登入、瀏覽器還記著）：直接登出，回到帳號密碼畫面
+      console.log('[admin] not admin, signed out:', u.id);
+      last = null;
+      await sb.auth.signOut();
+      $('#who').textContent = ''; signout.classList.add('hidden');
+      show('login');
+      $('#loginMsg').textContent = '這個帳號沒有管理權限，請用管理員帳號登入';
+      return;
+    }
     show('admin'); await loadAdmin();
   }
 
