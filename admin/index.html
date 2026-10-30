@@ -1,0 +1,373 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Math Game 更新頁後台</title>
+<link rel="icon" href="fox.png">
+<style>
+  :root {
+    --bg: #f4f6fb; --card: #ffffff; --ink: #1b2233; --muted: #5d6679; --line: #dfe4ee;
+    --brand: #1040b0; --brand-ink: #ffffff; --soft: #dce6fb; --warn: #b3261e; --warn-soft: #fde8e6;
+    --ok: #2e7d32; --suggest: #e08a00; --suggest-soft: #fff1d6; --phone: #fcfcff;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #10131a; --card: #1a1f2b; --ink: #e6e9f2; --muted: #9aa3b5; --line: #2c3343;
+      --brand: #8fb0ff; --brand-ink: #0b1a3d; --soft: #1f2d4f; --warn: #ffb4ab; --warn-soft: #3a1c1a;
+      --ok: #8fd694; --suggest: #ffc56b; --suggest-soft: #3a2d12; --phone: #121620;
+    }
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--ink); font: 16px/1.55 -apple-system, BlinkMacSystemFont, "PingFang TC", "Noto Sans TC", "Microsoft JhengHei", sans-serif; }
+  header { display: flex; align-items: center; gap: 12px; padding: 14px 16px; border-bottom: 1px solid var(--line); background: var(--card); position: sticky; top: 0; z-index: 2; }
+  header img { width: 36px; height: 36px; }
+  header h1 { font-size: 18px; margin: 0; flex: 1; }
+  header .who { font-size: 13px; color: var(--muted); text-align: right; }
+  main { max-width: 1080px; margin: 0 auto; padding: 20px 16px 48px; }
+  .card { background: var(--card); border: 1px solid var(--line); border-radius: 16px; padding: 20px; }
+  .muted { color: var(--muted); }
+  .small { font-size: 13px; }
+  button { font: inherit; cursor: pointer; border-radius: 12px; border: 1px solid var(--line); background: var(--card); color: var(--ink); padding: 10px 16px; }
+  button.primary { background: var(--brand); color: var(--brand-ink); border-color: var(--brand); font-weight: 700; }
+  button.link { border: none; background: none; color: var(--brand); padding: 4px 0; }
+  button:disabled { opacity: .5; cursor: default; }
+  input[type=number], input[type=email], input[type=password] { font: inherit; width: 100%; padding: 10px 12px; border-radius: 10px; border: 1px solid var(--line); background: var(--bg); color: var(--ink); }
+  #login { max-width: 420px; margin: 40px auto; display: grid; gap: 12px; }
+  #login h2 { margin: 0 0 4px; font-size: 20px; }
+  #login .row { display: grid; gap: 8px; }
+  .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+  @media (max-width: 860px) { .grid { grid-template-columns: 1fr; } }
+  .plat h2 { margin: 0; font-size: 19px; }
+  .plat .sub { margin: 2px 0 16px; }
+  .field { margin: 0 0 18px; }
+  .field > label, .field > .label { display: block; font-weight: 700; margin-bottom: 6px; }
+  .modes { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+  .modes button { padding: 10px 2px; font-weight: 700; font-size: 15px; white-space: nowrap; }
+  .modes button[aria-pressed=true][data-mode=off] { background: var(--soft); border-color: var(--brand); }
+  .modes button[aria-pressed=true][data-mode=suggest] { background: var(--suggest-soft); border-color: var(--suggest); }
+  .modes button[aria-pressed=true][data-mode=force] { background: var(--warn-soft); border-color: var(--warn); color: var(--warn); }
+  .mode-note { margin-top: 6px; font-size: 14px; color: var(--muted); min-height: 1.5em; }
+  .body { display: grid; grid-template-columns: 1fr 230px; gap: 18px; align-items: start; }
+  @media (max-width: 480px) { .body { grid-template-columns: 1fr; } .phone { margin: 0 auto; } }
+  .imgrow { display: flex; gap: 8px; flex-wrap: wrap; }
+  .thumb { width: 100%; max-height: 160px; object-fit: contain; border-radius: 10px; border: 1px solid var(--line); background: var(--bg); margin-bottom: 8px; display: block; }
+  .warnline { font-size: 13px; color: var(--warn); margin-top: 6px; }
+  .phone { width: 230px; height: 440px; border-radius: 30px; border: 8px solid #1b2233; overflow: hidden; position: relative; background: linear-gradient(var(--soft), var(--phone)); display: flex; flex-direction: column; align-items: center; padding: 22px 16px 10px; text-align: center; }
+  .phone .art { flex: 1; display: flex; align-items: center; justify-content: center; width: 100%; min-height: 0; }
+  .phone .art img { max-width: 100%; max-height: 190px; border-radius: 12px; }
+  .phone .art img.fox { max-height: 130px; border-radius: 0; }
+  .phone .t { font-weight: 800; font-size: 17px; margin-top: 10px; }
+  .phone .b { font-size: 12px; color: var(--muted); margin: 4px 0 14px; }
+  .phone .go { width: 100%; padding: 9px; border-radius: 20px; background: var(--brand); color: var(--brand-ink); font-weight: 700; font-size: 13px; }
+  .phone .later { height: 30px; line-height: 30px; font-size: 12px; color: var(--muted); }
+  .phone .off { position: absolute; inset: 0; background: rgba(16, 19, 26, .62); color: #fff; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 15px; padding: 20px; }
+  .savebar { display: flex; align-items: center; gap: 12px; margin-top: 8px; flex-wrap: wrap; }
+  .status { font-size: 14px; }
+  .status.err { color: var(--warn); }
+  .status.ok { color: var(--ok); }
+  .dirty { font-size: 12px; font-weight: 700; color: var(--suggest); border: 1px solid var(--suggest); border-radius: 999px; padding: 1px 8px; }
+  .tips { margin-top: 24px; }
+  .tips h3 { margin: 0 0 8px; font-size: 16px; }
+  .tips ol { margin: 0; padding-left: 20px; }
+  dialog { border: 1px solid var(--line); border-radius: 16px; background: var(--card); color: var(--ink); max-width: 440px; width: calc(100% - 32px); padding: 20px; }
+  dialog::backdrop { background: rgba(0, 0, 0, .45); }
+  dialog h3 { margin: 0 0 10px; }
+  dialog .btns { display: flex; gap: 8px; justify-content: flex-end; margin-top: 16px; }
+  .hidden { display: none !important; }
+  footer { text-align: center; font-size: 12px; color: var(--muted); padding: 0 16px 24px; }
+</style>
+</head>
+<body>
+<header>
+  <img src="fox.png" alt="">
+  <h1>Math Game 更新頁後台</h1>
+  <div class="who"><span id="who"></span><br><button class="link small hidden" id="signout">登出</button></div>
+</header>
+
+<main>
+  <section id="loading" class="muted">讀取中…</section>
+
+  <section id="login" class="card hidden">
+    <h2>登入</h2>
+    <p class="muted small" style="margin:0">用遊戲裡的帳號登入。只有管理員帳號能存檔。</p>
+    <button class="primary" data-oauth="apple">用 Apple 登入</button>
+    <button data-oauth="google">用 Google 登入</button>
+    <details>
+      <summary class="small">用 Email 登入</summary>
+      <form id="emailForm" class="row" style="margin-top:10px">
+        <input type="email" id="email" placeholder="Email" autocomplete="username" required>
+        <input type="password" id="password" placeholder="密碼" autocomplete="current-password" required>
+        <button class="primary" type="submit">登入</button>
+      </form>
+    </details>
+    <div id="loginMsg" class="status err"></div>
+  </section>
+
+  <section id="noadmin" class="card hidden">
+    <h2 style="margin-top:0">這個帳號沒有管理權限</h2>
+    <p>帳號編號：<code id="myUid"></code></p>
+    <p class="muted small">要加成管理員，把這串編號給 Claude。</p>
+  </section>
+
+  <section id="admin" class="hidden">
+    <div class="grid" id="plats"></div>
+    <div class="card tips">
+      <h3>開強制更新之前</h3>
+      <ol class="small">
+        <li>新版本已經上架，用自己的手機到商店確認看得到新版（剛上架時各地商店會晚一點）。</li>
+        <li>build 號填「新版的號碼」：比它小的玩家才會被擋，新版本身和送審中的版本不會被擋。不要填比送審中那一版還大的數字，否則審核員打不開會被退件。</li>
+        <li>只有已經裝了「有更新頁的版本」的玩家看得到。更早的版本不會讀這裡的設定。</li>
+        <li>平常維持「關閉」或「建議更新」。強制更新只在舊版會出問題時開（例如排行榜改了、舊版上傳的成績會錯）。</li>
+      </ol>
+    </div>
+  </section>
+</main>
+
+<dialog id="confirm">
+  <h3 id="cTitle"></h3>
+  <div id="cBody" class="small"></div>
+  <div class="btns"><button id="cNo">取消</button><button class="primary" id="cYes">確定</button></div>
+</dialog>
+
+<footer>© 2026 MRJC</footer>
+
+<template id="platTpl">
+  <section class="card plat">
+    <h2 class="name"></h2>
+    <p class="sub muted small"></p>
+    <div class="body">
+      <div>
+        <div class="field">
+          <span class="label">狀態</span>
+          <div class="modes">
+            <button type="button" data-mode="off">關閉</button>
+            <button type="button" data-mode="suggest">建議更新</button>
+            <button type="button" data-mode="force">強制更新</button>
+          </div>
+          <div class="mode-note"></div>
+        </div>
+        <div class="field">
+          <label>build 號（低於這個號碼的玩家會看到）</label>
+          <input type="number" class="build" min="0" step="1" inputmode="numeric">
+          <div class="muted small hint"></div>
+        </div>
+        <div class="field">
+          <span class="label">圖片</span>
+          <img class="thumb hidden" alt="">
+          <div class="muted small imgname"></div>
+          <div class="imgrow" style="margin-top:6px">
+            <button type="button" class="pick">換圖片</button>
+            <button type="button" class="clear">改回夥伴</button>
+            <input type="file" class="file hidden" accept="image/jpeg,image/png,image/webp">
+          </div>
+          <div class="muted small">不放圖就顯示玩家自己的夥伴。建議正方形或直式（例如 1080×1080），會自動縮到 1MB 以內。</div>
+          <div class="warnline ioswarn hidden">iPhone 的圖不能有 Android、Google Play 的字或圖示（Apple 規定）。</div>
+        </div>
+        <div class="savebar">
+          <button type="button" class="primary save">儲存</button>
+          <span class="dirty hidden">還沒儲存</span>
+          <span class="status"></span>
+        </div>
+        <div class="muted small updated" style="margin-top:8px"></div>
+      </div>
+      <div>
+        <div class="phone">
+          <div class="art"><img class="pimg fox" src="fox.png" alt=""></div>
+          <div class="t">有新的版本囉</div>
+          <div class="b"></div>
+          <div class="go">更新 →</div>
+          <div class="later">稍後</div>
+          <div class="off">關閉中：玩家看不到</div>
+        </div>
+        <div class="muted small" style="text-align:center;margin-top:6px">玩家看到的樣子</div>
+      </div>
+    </div>
+  </section>
+</template>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
+<script>
+(() => {
+  const URL_ = 'https://xcqikahbdyzyjxqlstxc.supabase.co';
+  // anon key：和 App 裡同一把（公開的前端金鑰）。能改什麼由資料庫規則決定（supabase/app_update_gate.sql）。
+  const ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhjcWlrYWhiZHl6eWp4cWxzdHhjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIyMDIwNjQsImV4cCI6MjA4Nzc3ODA2NH0.5Vmr4omcqnEsjDrlaCjGFTYzd4QJNPpeDMsyN87WkYI';
+  const BUCKET = 'update';
+  const MAX_BYTES = 1024 * 1024;
+  const sb = supabase.createClient(URL_, ANON, { auth: { persistSession: true, detectSessionInUrl: true, flowType: 'pkce' } });
+
+  const PLATS = {
+    ios: { name: 'iPhone／iPad', sub: 'App Store', hint: '填新版的 build 號，例如新版是 243 就填 243。' },
+    android: { name: 'Android', sub: 'Google Play', hint: '填新版在 Google Play 的版本代碼（versionCode）。' },
+  };
+  const NOTES = {
+    off: '玩家看不到更新頁。',
+    suggest: '有「稍後」可以先玩；同一個版本一天最多出現一次。',
+    force: '只有「更新」：不更新就不能玩。',
+  };
+  const BODY = { off: '我們去更新', suggest: '我們去更新', force: '更新後就能繼續玩' };
+
+  const $ = (s, r = document) => r.querySelector(s);
+  const show = (id) => ['loading', 'login', 'noadmin', 'admin'].forEach(x => $('#' + x).classList.toggle('hidden', x !== id));
+  const imgUrl = (n) => n ? `${URL_}/storage/v1/object/public/${BUCKET}/${encodeURIComponent(n)}` : null;
+  const fmt = (t) => t ? new Date(t).toLocaleString('zh-TW', { month: 'numeric', day: 'numeric', hour: '2-digit', minute: '2-digit' }) : '';
+
+  function ask(title, html) {
+    return new Promise(res => {
+      const d = $('#confirm');
+      $('#cTitle').textContent = title; $('#cBody').innerHTML = html;
+      const done = (v) => { d.close(); $('#cYes').onclick = $('#cNo').onclick = null; res(v); };
+      $('#cYes').onclick = () => done(true); $('#cNo').onclick = () => done(false);
+      d.oncancel = () => done(false);
+      d.showModal();
+    });
+  }
+
+  // 圖片縮到最長邊 1200、JPEG、1MB 以內（透明的地方補白色）
+  async function shrink(file) {
+    const bmp = await createImageBitmap(file);
+    let side = 1200, q = 0.88;
+    for (let i = 0; i < 8; i++) {
+      const k = Math.min(1, side / Math.max(bmp.width, bmp.height));
+      const c = document.createElement('canvas');
+      c.width = Math.round(bmp.width * k); c.height = Math.round(bmp.height * k);
+      const g = c.getContext('2d');
+      g.fillStyle = '#ffffff'; g.fillRect(0, 0, c.width, c.height);
+      g.drawImage(bmp, 0, 0, c.width, c.height);
+      const blob = await new Promise(r => c.toBlob(r, 'image/jpeg', q));
+      if (blob && blob.size <= MAX_BYTES) return blob;
+      if (q > 0.7) q -= 0.08; else side = Math.round(side * 0.85);
+    }
+    throw new Error('圖片太大，縮不到 1MB 以內');
+  }
+
+  function buildCard(row) {
+    const p = row.platform, meta = PLATS[p];
+    const el = $('#platTpl').content.firstElementChild.cloneNode(true);
+    const st = { saved: { ...row }, cur: { mode: row.mode, below_build: row.below_build, image: row.image } };
+    $('.name', el).textContent = meta.name;
+    $('.sub', el).textContent = meta.sub;
+    $('.hint', el).textContent = meta.hint;
+    if (p === 'ios') $('.ioswarn', el).classList.remove('hidden');
+    const build = $('.build', el), status = $('.status', el);
+    const setStatus = (t, cls = '') => { status.textContent = t; status.className = 'status ' + cls; };
+
+    function render() {
+      const c = st.cur;
+      el.querySelectorAll('.modes button').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.mode === c.mode)));
+      $('.mode-note', el).textContent = NOTES[c.mode] || '';
+      if (document.activeElement !== build) build.value = c.below_build || '';
+      const u = imgUrl(c.image);
+      $('.thumb', el).classList.toggle('hidden', !u);
+      if (u) $('.thumb', el).src = u;
+      $('.imgname', el).textContent = c.image ? c.image : '（夥伴）';
+      $('.clear', el).disabled = !c.image;
+      const pi = $('.pimg', el);
+      pi.src = u || 'fox.png'; pi.classList.toggle('fox', !u);
+      $('.b', el).textContent = BODY[c.mode];
+      $('.later', el).style.visibility = c.mode === 'force' ? 'hidden' : 'visible';
+      $('.off', el).classList.toggle('hidden', c.mode !== 'off');
+      const dirty = c.mode !== st.saved.mode || Number(c.below_build || 0) !== Number(st.saved.below_build || 0) || (c.image || null) !== (st.saved.image || null);
+      $('.dirty', el).classList.toggle('hidden', !dirty);
+      $('.updated', el).textContent = st.saved.updated_at ? '上次儲存：' + fmt(st.saved.updated_at) : '';
+    }
+
+    el.querySelectorAll('.modes button').forEach(b => b.onclick = () => { st.cur.mode = b.dataset.mode; setStatus(''); render(); });
+    build.oninput = () => { st.cur.below_build = build.value === '' ? 0 : Math.max(0, Math.floor(Number(build.value))); render(); };
+    $('.pick', el).onclick = () => $('.file', el).click();
+    $('.clear', el).onclick = () => { st.cur.image = null; render(); };
+    $('.file', el).onchange = async (e) => {
+      const f = e.target.files[0]; e.target.value = '';
+      if (!f) return;
+      setStatus('圖片上傳中…');
+      try {
+        const blob = await shrink(f);
+        const name = `${p}-${Date.now()}.jpg`;
+        const { error } = await sb.storage.from(BUCKET).upload(name, blob, { contentType: 'image/jpeg', cacheControl: '31536000', upsert: false });
+        if (error) throw error;
+        st.cur.image = name; setStatus('圖片已上傳，按「儲存」才會換上', 'ok'); render();
+      } catch (err) { setStatus('圖片上傳失敗：' + (err.message || err), 'err'); }
+    };
+    $('.save', el).onclick = async () => {
+      const c = st.cur, n = Number(c.below_build || 0);
+      if (c.mode !== 'off' && n < 2) { setStatus('要填 build 號', 'err'); build.focus(); return; }
+      if (c.mode === 'force') {
+        const ok = await ask(`開啟 ${meta.name} 強制更新？`,
+          `<p>build 號<b>低於 ${n}</b> 的 ${meta.name} 玩家，打開遊戲只會看到更新頁，不更新就不能玩。</p>` +
+          `<p>請確認：<br>① build ${n} 已經在 ${meta.sub} 上架，自己手機看得到<br>② ${n} 不超過送審中那一版的號碼</p>`);
+        if (!ok) return;
+      } else if (c.mode === 'suggest' && st.saved.mode !== 'suggest') {
+        const ok = await ask(`開啟 ${meta.name} 建議更新？`, `<p>build 號低於 ${n} 的玩家，每天第一次回到首頁會看到更新頁，可以按「稍後」。</p>`);
+        if (!ok) return;
+      }
+      $('.save', el).disabled = true; setStatus('儲存中…');
+      const { data, error } = await sb.from('app_update_gate')
+        .update({ mode: c.mode, below_build: n, image: c.image || null })
+        .eq('platform', p).select('platform,mode,below_build,image,updated_at');
+      $('.save', el).disabled = false;
+      if (error) { setStatus('沒有存到：' + error.message, 'err'); return; }
+      if (!data || !data.length) { setStatus('沒有存到：這個帳號沒有權限', 'err'); return; }
+      st.saved = { ...data[0] }; st.cur = { mode: data[0].mode, below_build: data[0].below_build, image: data[0].image };
+      setStatus('已儲存，玩家下次打開或回到遊戲就會套用', 'ok'); render();
+    };
+    render();
+    return el;
+  }
+
+  async function loadAdmin() {
+    const { data, error } = await sb.from('app_update_gate').select('platform,mode,below_build,image,updated_at').order('platform', { ascending: false });
+    const box = $('#plats'); box.innerHTML = '';
+    if (error || !data) { box.innerHTML = `<div class="card status err">讀不到設定：${(error && error.message) || '沒有資料'}</div>`; return; }
+    for (const p of ['ios', 'android']) {
+      const row = data.find(r => r.platform === p) || { platform: p, mode: 'off', below_build: 0, image: null };
+      box.appendChild(buildCard(row));
+    }
+  }
+
+  async function route(session) {
+    const signout = $('#signout');
+    if (!session) { $('#who').textContent = ''; signout.classList.add('hidden'); show('login'); return; }
+    const u = session.user;
+    $('#who').textContent = u.email || (u.app_metadata && u.app_metadata.provider) || '';
+    signout.classList.remove('hidden');
+    const { data: isAdmin, error } = await sb.rpc('is_app_admin');
+    if (error || !isAdmin) { $('#myUid').textContent = u.id; show('noadmin'); return; }
+    show('admin'); await loadAdmin();
+  }
+
+  document.querySelectorAll('[data-oauth]').forEach(b => b.onclick = async () => {
+    const { error } = await sb.auth.signInWithOAuth({ provider: b.dataset.oauth, options: { redirectTo: location.origin + location.pathname } });
+    if (error) $('#loginMsg').textContent = '登入失敗：' + error.message;
+  });
+  $('#emailForm').onsubmit = async (e) => {
+    e.preventDefault();
+    const { error } = await sb.auth.signInWithPassword({ email: $('#email').value.trim(), password: $('#password').value });
+    if (error) $('#loginMsg').textContent = '登入失敗：' + error.message;
+  };
+  $('#signout').onclick = async () => { await sb.auth.signOut(); };
+
+  // 示範畫面（?demo）：不登入、不讀不寫，只看版面；儲存、上傳都按不了
+  if (new URLSearchParams(location.search).has('demo')) {
+    $('#who').textContent = '示範畫面（不會存檔）';
+    show('admin');
+    const box = $('#plats');
+    box.appendChild(buildCard({ platform: 'ios', mode: 'force', below_build: 243, image: null, updated_at: new Date().toISOString() }));
+    box.appendChild(buildCard({ platform: 'android', mode: 'suggest', below_build: 6, image: null, updated_at: null }));
+    box.querySelectorAll('.save, .pick').forEach(b => b.disabled = true);
+    return;
+  }
+
+  let last = undefined;
+  const go = (session) => {
+    const id = session ? session.user.id : null;
+    if (id === last) return;
+    last = id;
+    route(session);
+  };
+  sb.auth.onAuthStateChange((_ev, session) => setTimeout(() => go(session), 0));
+  sb.auth.getSession().then(({ data }) => go(data.session), () => go(null));
+})();
+</script>
+</body>
+</html>
